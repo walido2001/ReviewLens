@@ -14,8 +14,8 @@ def start_processing():
     appID = data.get("appID")
 
     extract_reviews(appID)
-    extract_topics(appID)
-    link_topics_reviews(appID)
-    analyze_sentiment(appID)
+    # extract_topics(appID)
+    # link_topics_reviews(appID)
+    # analyze_sentiment(appID)
 
     return "This is the API route"

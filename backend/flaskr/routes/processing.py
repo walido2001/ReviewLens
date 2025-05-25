@@ -1,6 +1,6 @@
 import threading
-
 from flask import Blueprint, request, jsonify, current_app
+from .. import create_app
 
 from ..services.googlePlayStore import validate_ID
 from ..services.reviewExtraction import extract_reviews
@@ -13,7 +13,6 @@ processing_blueprint = Blueprint("api", __name__)
 
 @processing_blueprint.route("/test/reviewExtraction", methods=["POST"])
 def test_review_extraction():
-
     data = request.get_json()
     appID = data.get("appID")
 
@@ -21,7 +20,8 @@ def test_review_extraction():
         return jsonify({"Error": "Input is missing AppID."}), 400
 
     def extract_reviews_contexted(appID):
-        with current_app.app_context():
+        app = create_app()
+        with app.app_context():
             extract_reviews(appID)
 
     thread = threading.Thread(target=extract_reviews_contexted, args=(appID,))

@@ -3,7 +3,7 @@ import os
 class Config:
     SQLALCHEMY_DATABASE_URI = "postgresql://localhost/ReviewLensDB"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
 class DevelopmentConfig(Config):
     DEBUG = True

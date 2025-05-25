@@ -34,6 +34,26 @@ def test_review_extraction():
 
     return jsonify({"status": "Request received"}), 202
 
+@processing_blueprint.route("/test/sentimentAnalysis", methods=["POST"])
+def test_sentiment_analysis():
+    data = request.get_json()
+    appID = data.get("appID")
+
+    if not appID:
+        return jsonify({"Error": "Input is missing AppID."}), 400
+
+    def analyze_sentiment_contexted(appID):
+        app = create_app()
+        with app.app_context():
+            from ..services.sentimentAnalysis import analyze_sentiment
+            analyze_sentiment(appID)
+
+    thread = threading.Thread(target=analyze_sentiment_contexted, args=(appID,))
+    thread.daemon = True
+    thread.start()
+
+    return jsonify({"status": "Request received"}), 202
+
 @processing_blueprint.route("/startProcessing", methods=["POST"])
 def start_processing():
     data = request.get_json()

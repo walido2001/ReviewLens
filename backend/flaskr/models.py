@@ -2,15 +2,9 @@ from typing import List, Optional
 from datetime import datetime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, ForeignKey
-from flask_sqlalchemy import SQLAlchemy
+from . import db
 
-class Base(DeclarativeBase):
-    """Base class for all models"""
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-
-db = SQLAlchemy(model_class=Base)
-
-class App(Base):
+class App(db.Model):
     __tablename__ = "application"
 
     id: Mapped[str] = mapped_column(primary_key=True)
@@ -28,7 +22,7 @@ class App(Base):
         lazy="selectin"
     )
 
-class Review(Base):
+class Review(db.Model):
     __tablename__ = "review"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -48,7 +42,7 @@ class Review(Base):
     app: Mapped["App"] = relationship(back_populates="reviews")
     topic: Mapped[Optional["Topic"]] = relationship(back_populates="reviews")
 
-class Topic(Base):
+class Topic(db.Model):
     __tablename__ = "topic"
     
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -5,20 +5,11 @@ from ..models import App, Review, Topic
 from .. import db, logger
 
 def get_topic_distribution(text: str, vectorizer: CountVectorizer, lda_model: LatentDirichletAllocation) -> List[float]:
-    """Get the topic distribution for a given text."""
     X = vectorizer.transform([text])
     return lda_model.transform(X)[0]
 
 def link_topics_reviews(app_id: str, batch_size: int = 500) -> None:
-    """
-    Link reviews to their most relevant topics using LDA topic distributions.
-    
-    Args:
-        app_id (str): The ID of the app to process
-        batch_size (int): Number of reviews to process in each batch
-    """
     try:
-        # Check if app exists and has topics
         app = App.query.get(app_id)
         if not app:
             logger.error(f"App with ID {app_id} not found")
@@ -29,7 +20,7 @@ def link_topics_reviews(app_id: str, batch_size: int = 500) -> None:
             logger.error(f"No topics found for app {app_id}")
             return
             
-        # Initialize vectorizer and LDA model with same parameters as topic extraction
+        
         vectorizer = CountVectorizer(
             max_df=0.5,
             min_df=2,
@@ -46,12 +37,12 @@ def link_topics_reviews(app_id: str, batch_size: int = 500) -> None:
             verbose=0
         )
         
-        # Fit vectorizer and LDA model on topic contents
+        
         topic_contents = [topic.content for topic in topics]
         X = vectorizer.fit_transform(topic_contents)
         lda_model.fit(X)
         
-        # Process reviews in batches
+       
         total_reviews = Review.query.filter_by(app_id=app_id).count()
         processed_count = 0
         skipped_count = 0
@@ -62,16 +53,16 @@ def link_topics_reviews(app_id: str, batch_size: int = 500) -> None:
             
             for review in reviews_batch:
                 try:
-                    # Skip reviews that are too short or already have a topic
+                    
                     if len(review.content.split()) < 3 or review.topic_id is not None:
                         continue
                         
-                    # Get topic distribution for the review
+                    
                     topic_distribution = get_topic_distribution(review.content, vectorizer, lda_model)
                     
-                    # Find the topic with highest probability
+                    
                     max_prob = max(topic_distribution)
-                    if max_prob > 0.1:  # Adjust threshold as needed
+                    if max_prob > 0.1: 
                         most_relevant_topic_id = topics[topic_distribution.argmax()].id
                         review.topic_id = most_relevant_topic_id
                     else:

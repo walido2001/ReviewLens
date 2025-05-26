@@ -74,6 +74,26 @@ def test_topic_extraction():
 
     return jsonify({"status": "Request received"}), 202
 
+@processing_blueprint.route("/test/reviewTopicLinkage", methods=["POST"])
+def test_review_topic_linkage():
+    data = request.get_json()
+    appID = data.get("appID")
+
+    if not appID:
+        return jsonify({"Error": "Input is missing AppID."}), 400
+
+    def link_topics_contexted(appID):
+        app = create_app()
+        with app.app_context():
+            from ..services.reviewTopicLinkage import link_topics_reviews
+            link_topics_reviews(appID)
+
+    thread = threading.Thread(target=link_topics_contexted, args=(appID,))
+    thread.daemon = True
+    thread.start()
+
+    return jsonify({"status": "Request received"}), 202
+
 @processing_blueprint.route("/startProcessing", methods=["POST"])
 def start_processing():
     data = request.get_json()

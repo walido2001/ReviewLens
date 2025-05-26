@@ -7,7 +7,7 @@ from sklearn.decomposition import LatentDirichletAllocation
 import re
 from typing import List, Optional, Tuple
 from langdetect import detect, LangDetectException
-from ..models import Review, Topic
+from ..models import Review, Topic, App
 from .. import db, logger
 
 try:
@@ -108,6 +108,23 @@ def save_topics(vectorizer: CountVectorizer, lda_model: LatentDirichletAllocatio
 
 def extract_topics(app_id: str, num_topics: int = 10, words_per_topic: int = 8, batch_size: int = 1000) -> None:
     try:
+        app = App.query.get(app_id)
+        if not app:
+            logger.error(f"App with ID {app_id} not found")
+            return
+
+        existing_topics = Topic.query.filter_by(app_id=app_id).all()
+        if existing_topics:
+            logger.info(f"Found {len(existing_topics)} existing topics for app {app_id}. Removing them...")
+            for topic in existing_topics:
+                db.session.delete(topic)
+            db.session.commit()
+            logger.info("Existing topics removed successfully")
+            
+        Review.query.filter_by(app_id=app_id).update({Review.topic_id: None})
+        db.session.commit()
+        logger.info("Reset topic_id for all reviews")
+
         total_reviews = Review.query.filter_by(app_id=app_id).count()
         if total_reviews == 0:
             logger.warning(f"No reviews found for app_id: {app_id}")

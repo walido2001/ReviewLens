@@ -39,7 +39,7 @@ def sanitize_review_data(review_data, app_id):
         logger.error(f"Error sanitizing review data: {str(e)}")
         raise
 
-def extract_reviews(appID, limit=10000):
+def extract_reviews(appID, limit=30000):
     try:
         app_data = appScraper(appID, lang='en', country='us')
         app_record = App(

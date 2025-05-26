@@ -1,6 +1,9 @@
 import threading
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, Response
 from .. import create_app
+import json
+import queue
+import time
 
 from ..services.googlePlayStore import validate_ID
 from ..services.reviewExtraction import extract_reviews
@@ -10,6 +13,87 @@ from ..services.sentimentAnalysis import analyze_sentiment
 
 processing_blueprint = Blueprint("api", __name__)
 
+def process_app(app_id: str, status_queue: queue.Queue):
+    """Process the app through all stages and update status through queue."""
+    app = create_app()
+    with app.app_context():
+        try:
+            status_queue.put({"stage": "validation", "status": "started"})
+            if not validate_ID(app_id):
+                status_queue.put({"stage": "validation", "status": "failed", "error": "Invalid App ID"})
+                return
+            status_queue.put({"stage": "validation", "status": "completed"})
+
+            status_queue.put({"stage": "review_extraction", "status": "started"})
+            try:
+                extract_reviews(app_id)
+                status_queue.put({"stage": "review_extraction", "status": "completed"})
+            except Exception as e:
+                status_queue.put({"stage": "review_extraction", "status": "failed", "error": str(e)})
+                return
+
+            status_queue.put({"stage": "sentiment_analysis", "status": "started"})
+            try:
+                analyze_sentiment(app_id)
+                status_queue.put({"stage": "sentiment_analysis", "status": "completed"})
+            except Exception as e:
+                status_queue.put({"stage": "sentiment_analysis", "status": "failed", "error": str(e)})
+                return
+
+            status_queue.put({"stage": "topic_extraction", "status": "started"})
+            try:
+                extract_topics(app_id)
+                status_queue.put({"stage": "topic_extraction", "status": "completed"})
+            except Exception as e:
+                status_queue.put({"stage": "topic_extraction", "status": "failed", "error": str(e)})
+                return
+
+            status_queue.put({"stage": "topic_linkage", "status": "started"})
+            try:
+                link_topics_reviews(app_id)
+                status_queue.put({"stage": "topic_linkage", "status": "completed"})
+            except Exception as e:
+                status_queue.put({"stage": "topic_linkage", "status": "failed", "error": str(e)})
+                return
+
+            status_queue.put({"stage": "all", "status": "completed"})
+
+        except Exception as e:
+            status_queue.put({"stage": "all", "status": "failed", "error": str(e)})
+
+@processing_blueprint.route("/process", methods=["POST"])
+def process_app_endpoint():
+    """Endpoint to process an app through all stages with live status updates."""
+    data = request.get_json()
+    app_id = data.get("appID")
+
+    if not app_id:
+        return jsonify({"error": "Input is missing AppID."}), 400
+
+    status_queue = queue.Queue()
+
+    def generate():
+        app = create_app()
+        with app.app_context():
+            thread = threading.Thread(target=process_app, args=(app_id, status_queue))
+            thread.daemon = True
+            thread.start()
+
+            while True:
+                try:
+                    status = status_queue.get(timeout=1)
+                
+                    if status["stage"] == "all":
+                        yield f"data: {json.dumps(status)}\n\n"
+                        break
+                        
+                    yield f"data: {json.dumps(status)}\n\n"
+                    
+                except queue.Empty:
+                    yield f"data: {json.dumps({'status': 'heartbeat'})}\n\n"
+                    continue
+
+    return Response(generate(), mimetype='text/event-stream')
 
 @processing_blueprint.route("/test/reviewExtraction", methods=["POST"])
 def test_review_extraction():
@@ -94,14 +178,3 @@ def test_review_topic_linkage():
 
     return jsonify({"status": "Request received"}), 202
 
-@processing_blueprint.route("/startProcessing", methods=["POST"])
-def start_processing():
-    data = request.get_json()
-    appID = data.get("appID")
-
-    extract_reviews(appID)
-    # extract_topics(appID)
-    # link_topics_reviews(appID)
-    # analyze_sentiment(appID)
-
-    return "This is the API route"

@@ -36,7 +36,7 @@ const PieChart = () => {
   } satisfies ChartConfig;
 
   return (
-    <ChartContainer config={chartConfig} className="min-h-64 w-full">
+    <ChartContainer config={chartConfig} className="min-h-auto w-full">
       <RPieChart>
         <ChartTooltip content={<ChartTooltipContent />} />
         <Pie data={dummyData} dataKey="count" nameKey="rating" label />

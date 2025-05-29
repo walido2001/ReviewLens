@@ -10,6 +10,7 @@ import {
 } from "./components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PieChart from "./components/custom/PieChart";
+import TopicTable from "./components/custom/TopicTable";
 
 function App() {
   return (
@@ -34,12 +35,12 @@ function App() {
                 Chatbot
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="Overview" className="col-span-2">
-              <div className="grid grid-cols-2 gap-8">
+            <TabsContent value="Overview" className="col-span-2 w-9/10">
+              <div className="grid grid-cols-2 gap-8 lg:grid-cols-2 sm:grid-cols-1">
                 <div>
-                  <Card>
+                  <Card className="h-96">
                     <CardHeader>
-                      <CardTitle>Box 1</CardTitle>
+                      <CardTitle>Rating Breakdown</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <PieChart />
@@ -47,12 +48,12 @@ function App() {
                   </Card>
                 </div>
                 <div>
-                  <Card>
+                  <Card className="h-96">
                     <CardHeader>
-                      <CardTitle>Box 2</CardTitle>
+                      <CardTitle>Topics List</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p>Graph is here</p>
+                      <TopicTable />
                     </CardContent>
                   </Card>
                 </div>

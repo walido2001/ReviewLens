@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "./components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PieChart from "./components/custom/PieChart";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           <h1>Dashboard</h1>
         </div>
         <div>
-          <Tabs>
+          <Tabs defaultValue="Overview">
             <TabsList>
               <TabsTrigger value="Overview">Overview</TabsTrigger>
               <TabsTrigger value="Reviews" disabled>
@@ -41,7 +42,7 @@ function App() {
                       <CardTitle>Box 1</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p>Graph is here</p>
+                      <PieChart />
                     </CardContent>
                   </Card>
                 </div>
@@ -55,6 +56,8 @@ function App() {
                     </CardContent>
                   </Card>
                 </div>
+                <div>Box 3</div>
+                <div>Box 4</div>
               </div>
             </TabsContent>
           </Tabs>

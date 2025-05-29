@@ -17,12 +17,12 @@ function App() {
       <Navbar />
 
       <div className="p-7">
-        <div>
-          <h1>Dashboard</h1>
-        </div>
-        <div>
-          <Tabs defaultValue="Overview">
-            <TabsList>
+        <div className="">
+          <Tabs
+            defaultValue="Overview"
+            className="grid grid-cols-2 justify-items-center gap-y-6"
+          >
+            <TabsList className="col-span-2 w-1/3">
               <TabsTrigger value="Overview">Overview</TabsTrigger>
               <TabsTrigger value="Reviews" disabled>
                 Reviews
@@ -34,7 +34,7 @@ function App() {
                 Chatbot
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="Overview">
+            <TabsContent value="Overview" className="col-span-2">
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <Card>

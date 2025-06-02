@@ -11,6 +11,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PieChart from "./components/custom/PieChart";
 import TopicTable from "./components/custom/TopicTable";
+import ReviewTable from "./components/custom/ReviewTable";
+import SentimentDotChart from "./components/custom/SentimentDotChart";
 
 function App() {
   return (
@@ -36,7 +38,17 @@ function App() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="Overview" className="col-span-2 w-9/10">
-              <div className="grid grid-cols-2 gap-8 lg:grid-cols-2 sm:grid-cols-1">
+              <div className="grid grid-cols-2 gap-8">
+                <div className="col-span-2">
+                  <Card className="h-auto">
+                    <CardHeader>
+                      <CardTitle>Sentiment Dot Spread</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <SentimentDotChart />
+                    </CardContent>
+                  </Card>
+                </div>
                 <div>
                   <Card className="h-96">
                     <CardHeader>
@@ -57,8 +69,16 @@ function App() {
                     </CardContent>
                   </Card>
                 </div>
-                <div>Box 3</div>
-                <div>Box 4</div>
+                <div className="col-span-2">
+                  <Card className="h-96">
+                    <CardHeader>
+                      <CardTitle>Reviews</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ReviewTable />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </TabsContent>
           </Tabs>

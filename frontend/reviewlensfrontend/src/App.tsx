@@ -13,6 +13,8 @@ import PieChart from "./components/custom/PieChart";
 import TopicTable from "./components/custom/TopicTable";
 import ReviewTable from "./components/custom/ReviewTable";
 import SentimentDotChart from "./components/custom/SentimentDotChart";
+import ReviewMainDataTable from "./components/custom/ReviewMainDataTable";
+import TopicsMainDataTable from "./components/custom/TopicsMainDataTable";
 
 function App() {
   return (
@@ -27,21 +29,27 @@ function App() {
           >
             <TabsList className="col-span-2 w-1/3">
               <TabsTrigger value="Overview">Overview</TabsTrigger>
-              <TabsTrigger value="Reviews" disabled>
-                Reviews
-              </TabsTrigger>
-              <TabsTrigger value="Topics" disabled>
-                Topics
-              </TabsTrigger>
+              <TabsTrigger value="Reviews">Reviews</TabsTrigger>
+              <TabsTrigger value="Topics">Topics</TabsTrigger>
               <TabsTrigger value="Chatbot" disabled>
                 Chatbot
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="Topics" className="col-span-2 w-9/10">
+              <TopicsMainDataTable />
+            </TabsContent>
+
+            <TabsContent value="Reviews" className="col-span-2 w-9/10">
+              <ReviewMainDataTable />
+            </TabsContent>
+
             <TabsContent value="Overview" className="col-span-2 w-9/10">
               <div className="grid grid-cols-2 gap-8">
                 <div className="col-span-2">
                   <Card className="h-auto">
                     <CardHeader>
+                      ``
                       <CardTitle>Sentiment Dot Spread</CardTitle>
                     </CardHeader>
                     <CardContent>

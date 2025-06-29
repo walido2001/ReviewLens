@@ -2,7 +2,6 @@ import React from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -12,61 +11,74 @@ import {
 interface TopicData {
   TopicID: number;
   Topics: string;
-  AppID: number;
 }
 
 const TopicTable = () => {
-  const dummyHeader = ["TopicID", "Topics", "AppID"];
-
   const dummyData: TopicData[] = [
     {
-      TopicID: 0,
-      Topics: "Hello, There, These, Are, Fake, Topics, To Display",
-      AppID: 12,
+      TopicID: 5,
+      Topics: "performance, crashes, bugs, slow, lag",
     },
     {
-      TopicID: 1,
-      Topics: "Hello, There, These, Are, Fake, Topics, To Display",
-      AppID: 12,
+      TopicID: 8,
+      Topics: "accuracy, wrong, incorrect, unreliable",
     },
     {
-      TopicID: 2,
-      Topics: "Hello, There, These, Are, Fake, Topics, To Display",
-      AppID: 12,
+      TopicID: 11,
+      Topics: "pricing, cost, subscription, expensive",
     },
     {
-      TopicID: 3,
-      Topics: "Hello, There, These, Are, Fake, Topics, To Display",
-      AppID: 12,
+      TopicID: 12,
+      Topics: "writing, essays, assignments, homework",
     },
     {
-      TopicID: 4,
-      Topics: "Hello, There, These, Are, Fake, Topics, To Display",
-      AppID: 12,
+      TopicID: 14,
+      Topics: "tutoring, learning, education, teaching",
+    },
+    {
+      TopicID: 15,
+      Topics: "helpful, useful, assistance, support",
+    },
+    {
+      TopicID: 18,
+      Topics: "generic, vague, specific, detailed",
+    },
+    {
+      TopicID: 22,
+      Topics: "voice, audio, conversation, speech",
     },
   ];
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-left">TopicID</TableHead>
-          <TableHead className="text-center">Topics</TableHead>
-          <TableHead className="text-right">AppID</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {dummyData.map((item) => {
-          return (
-            <TableRow>
-              <TableCell className="text-left">{item.TopicID}</TableCell>
-              <TableCell className="text-center">{item.Topics}</TableCell>
-              <TableCell className="text-right">{item.AppID}</TableCell>
+    <div className="overflow-auto max-h-64">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-left">Topic ID</TableHead>
+            <TableHead className="text-left">Topic Keywords</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {dummyData.map((item) => (
+            <TableRow key={item.TopicID}>
+              <TableCell className="font-medium">{item.TopicID}</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {item.Topics.split(", ").map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </TableCell>
             </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

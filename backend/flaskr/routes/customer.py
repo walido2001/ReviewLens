@@ -193,3 +193,18 @@ def get_avg_rating():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@customer_blueprint.route("/apps", methods=["GET"])
+def get_all_apps():
+    try:
+        apps = App.query.all()
+
+        return jsonify({
+            "apps": [{
+                "id": app.id,
+                "name": app.name,
+                "description": app.description
+            } for app in apps]
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -1,0 +1,11 @@
+# Flask Environment Variables
+# Copy this file to .env and modify as needed
+
+# Flask Application (used in run_flask.sh)
+FLASK_APP=flaskr
+FLASK_ENV=development
+FLASK_DEBUG=1
+
+# Database Configuration (used in config.py)
+# The database URI is hardcoded in config.py, but you can override it here if needed
+# SQLALCHEMY_DATABASE_URI=postgresql://localhost/ReviewLensDB

@@ -7,66 +7,67 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
-import { AppWindow } from "lucide-react";
-import { ChevronsUpDown } from "lucide-react";
+import { AppWindow, ChevronsUpDown, Loader2 } from "lucide-react";
+import { useGlobalContext } from "@/context/GlobalContext";
+import type { App } from "@/dataTypes/reviewTypes";
 
 const AppSwitcher = () => {
-  const dummyCode = [
-    {
-      id: 0,
-      name: "ChatGPT",
-      description: "Ipsum Lorem Dipsum",
-    },
-    {
-      id: 1,
-      name: "WhatsApp",
-      description: "Ipsum Lorem Dipsum",
-    },
-    {
-      id: 2,
-      name: "Facebook",
-      description: "Ipsum Lorem Dipsum",
-    },
-  ];
-
-  const [appDisplay, setAppDisplay] = useState("Current App");
-  const [appList, setAppList] = useState(dummyCode);
+  const { state, actions } = useGlobalContext();
   const [popOverOpen, setPopOverOpen] = useState(false);
+
+  // Get display text for current app
+  const getDisplayText = () => {
+    if (state.isLoadingApps) return "Loading apps...";
+    if (!state.currentApp) return "Select an app";
+    return state.currentApp.name;
+  };
+
+  const handleAppSelect = async (app: App) => {
+    try {
+      await actions.setCurrentApp(app);
+      setPopOverOpen(false);
+    } catch (error) {
+      console.error("Error selecting app:", error);
+    }
+  };
 
   return (
     <div>
       <Popover open={popOverOpen} onOpenChange={setPopOverOpen}>
-        <PopoverTrigger>
-          <Button variant="outline">
-            <AppWindow />
-            {appDisplay}
-            <ChevronsUpDown />
+        <PopoverTrigger asChild>
+          <Button variant="outline" disabled={state.isLoadingApps}>
+            {state.isLoadingApps ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <AppWindow className="h-4 w-4" />
+            )}
+            {getDisplayText()}
+            <ChevronsUpDown className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent>
+        <PopoverContent className="w-64 p-0">
           <Command>
+            <CommandInput placeholder="Search apps..." />
             <CommandList>
-              {appList.map((item) => {
-                return (
+              <CommandEmpty>No apps found.</CommandEmpty>
+              <CommandGroup>
+                {state.appsList.map((app) => (
                   <CommandItem
-                    onSelect={() => {
-                      setAppDisplay(item.name), setPopOverOpen(false);
-                    }}
+                    key={app.id}
+                    onSelect={() => handleAppSelect(app)}
+                    className="cursor-pointer"
                   >
-                    <AppWindow />
-                    <span>{item.name}</span>
+                    <AppWindow className="h-4 w-4 mr-2" />
+                    <span>{app.name}</span>
                   </CommandItem>
-                );
-              })}
+                ))}
+              </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>

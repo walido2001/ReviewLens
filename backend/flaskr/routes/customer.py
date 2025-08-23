@@ -238,3 +238,138 @@ def get_rating_breakdown():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@customer_blueprint.route("/reviews/rating-trend", methods=["GET"])
+def get_rating_trend():
+    try:
+        app_id = request.args.get("appID")
+        period = request.args.get("period", "daily")  # daily, weekly, monthly
+        
+        if not app_id:
+            return jsonify({"error": "AppID is required"}), 400
+        
+        # Query reviews with date and rating
+        reviews = Review.query.filter_by(app_id=app_id)\
+            .order_by(Review.date.asc())\
+            .all()
+        
+        if not reviews:
+            return jsonify({
+                "app_id": app_id,
+                "period": period,
+                "trend_data": [],
+                "trend_statistics": {
+                    "change": "0.00",
+                    "percentageChange": "0.0",
+                    "direction": "stable"
+                }
+            })
+        
+        # Group by time period and calculate averages
+        trend_data = []
+        
+        if period == "daily":
+            # Group by day
+            daily_groups = {}
+            for review in reviews:
+                date_key = review.date.strftime('%Y-%m-%d')
+                if date_key not in daily_groups:
+                    daily_groups[date_key] = []
+                daily_groups[date_key].append(review.rating)
+            
+            # Calculate daily averages
+            for date, ratings in sorted(daily_groups.items()):
+                avg_rating = sum(ratings) / len(ratings)
+                trend_data.append({
+                    "date": date,
+                    "avg_rating": round(avg_rating, 2),
+                    "review_count": len(ratings)
+                })
+        
+        elif period == "weekly":
+            # Group by week
+            weekly_groups = {}
+            for review in reviews:
+                year, week, _ = review.date.isocalendar()
+                date_key = f"{year}-W{week:02d}"
+                if date_key not in weekly_groups:
+                    weekly_groups[date_key] = []
+                weekly_groups[date_key].append(review.rating)
+            
+            # Calculate weekly averages
+            for date, ratings in sorted(weekly_groups.items()):
+                avg_rating = sum(ratings) / len(ratings)
+                trend_data.append({
+                    "date": date,
+                    "avg_rating": round(avg_rating, 2),
+                    "review_count": len(ratings)
+                })
+        
+        elif period == "monthly":
+            # Group by month
+            monthly_groups = {}
+            for review in reviews:
+                date_key = review.date.strftime('%Y-%m')
+                if date_key not in monthly_groups:
+                    monthly_groups[date_key] = []
+                monthly_groups[date_key].append(review.rating)
+            
+            # Calculate monthly averages
+            for date, ratings in sorted(monthly_groups.items()):
+                avg_rating = sum(ratings) / len(ratings)
+                trend_data.append({
+                    "date": date,
+                    "avg_rating": round(avg_rating, 2),
+                    "review_count": len(ratings)
+                })
+        
+        # Calculate trend statistics
+        trend_statistics = calculate_trend_statistics(trend_data)
+        
+        return jsonify({
+            "app_id": app_id,
+            "period": period,
+            "trend_data": trend_data,
+            "trend_statistics": trend_statistics
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+def calculate_trend_statistics(trend_data):
+    """
+    Calculate trend statistics from trend data
+    """
+    if len(trend_data) < 2:
+        return {
+            "change": "0.00",
+            "percentageChange": "0.0",
+            "direction": "stable"
+        }
+    
+    # Split data into first and second half
+    mid_point = len(trend_data) // 2
+    first_half = trend_data[:mid_point]
+    second_half = trend_data[mid_point:]
+    
+    # Calculate averages for each half
+    first_avg = sum(item['avg_rating'] for item in first_half) / len(first_half)
+    second_avg = sum(item['avg_rating'] for item in second_half) / len(second_half)
+    
+    # Calculate change and percentage
+    change = second_avg - first_avg
+    percentage_change = (change / first_avg * 100) if first_avg != 0 else 0
+    
+    # Determine direction
+    if abs(change) < 0.01:  # Consider stable if change is very small
+        direction = "stable"
+    elif change > 0:
+        direction = "up"
+    else:
+        direction = "down"
+    
+    return {
+        "change": f"{change:.2f}",
+        "percentageChange": f"{percentage_change:.1f}",
+        "direction": direction
+    }

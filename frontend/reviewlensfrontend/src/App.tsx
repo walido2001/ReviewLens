@@ -10,12 +10,35 @@ import SentimentAvgPane from "./components/custom/SentimentAvgPane";
 import RatingAvgPane from "./components/custom/RatingAvgPane";
 import LatestReviewPane from "./components/custom/LatestReviewPane";
 import RatingTrendChart from "./components/custom/RatingTrendChart";
+import ProcessingScreen from "./components/custom/ProcessingScreen";
 import { GlobalProvider, useGlobalContext } from "./context/GlobalContext";
 import ErrorNotification from "./components/custom/ErrorNotification";
 import { AppWindow, Loader2 } from "lucide-react";
 
 function AppContent() {
   const { state, actions } = useGlobalContext();
+
+  // Show processing screen when processing is active
+  if (state.isProcessing && state.processingAppId) {
+    return (
+      <>
+        <Navbar />
+        <ProcessingScreen
+          appId={state.processingAppId}
+          onComplete={() => {
+            actions.stopProcessing();
+            // Refresh apps list to include the new app
+            actions.fetchApps();
+          }}
+          onError={(error) => {
+            actions.stopProcessing();
+            actions.setError(error);
+          }}
+        />
+        <ErrorNotification error={state.error} onClose={actions.clearError} />
+      </>
+    );
+  }
 
   // Show message when no app is selected
   if (!state.currentApp) {

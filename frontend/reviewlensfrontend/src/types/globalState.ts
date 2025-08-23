@@ -30,6 +30,10 @@ export interface GlobalState {
   isLoadingRatingAvg: boolean;
   isLoadingRatingBreakdown: boolean;
 
+  // Processing state
+  isProcessing: boolean;
+  processingAppId: string | null;
+
   // Error states
   error: string | null;
 }
@@ -64,7 +68,12 @@ export interface GlobalContextType {
     // Rating Breakdown actions
     fetchRatingBreakdown: () => Promise<void>;
 
+    // Processing actions
+    startProcessing: (appId: string) => Promise<void>;
+    stopProcessing: () => void;
+
     // Utility actions
+    setError: (error: string) => void;
     clearError: () => void;
     retryFailedRequest: () => Promise<void>;
   };

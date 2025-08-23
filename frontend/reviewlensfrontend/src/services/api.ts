@@ -139,6 +139,16 @@ export const apiService = {
     );
     return response.data;
   },
+
+  // Create EventSource for processing updates
+  createProcessingEventSource(appId: string): EventSource {
+    const baseURL = API_CONFIG.baseURL;
+    const url = `${baseURL}${ENDPOINTS.processApp}`;
+
+    // For EventSource, we need to use GET with query params
+    // The backend will need to handle this differently
+    return new EventSource(`${url}?appID=${appId}`);
+  },
 };
 
 export default apiService;

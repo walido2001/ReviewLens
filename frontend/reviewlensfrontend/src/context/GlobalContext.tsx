@@ -35,6 +35,10 @@ const initialState: GlobalState = {
   isLoadingRatingAvg: false,
   isLoadingRatingBreakdown: false,
 
+  // Processing state
+  isProcessing: false,
+  processingAppId: null,
+
   // Error states
   error: null,
 };
@@ -64,6 +68,10 @@ type Action =
   | {
       type: "SET_RATING_BREAKDOWN";
       payload: Array<{ rating: string; count: string }>;
+    }
+  | {
+      type: "SET_PROCESSING";
+      payload: { isProcessing: boolean; appId: string | null };
     }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "CLEAR_ERROR" };
@@ -109,6 +117,12 @@ const globalReducer = (state: GlobalState, action: Action): GlobalState => {
         return { ...state, ratingAvg: action.payload };
       case "SET_RATING_BREAKDOWN":
         return { ...state, ratingBreakdown: action.payload };
+      case "SET_PROCESSING":
+        return {
+          ...state,
+          isProcessing: action.payload.isProcessing,
+          processingAppId: action.payload.appId,
+        };
       case "SET_ERROR":
         return { ...state, error: action.payload };
       case "CLEAR_ERROR":
@@ -600,6 +614,27 @@ export const GlobalProvider: React.FC<{ children: ReactNode }> = ({
 
     clearError: () => {
       dispatch({ type: "CLEAR_ERROR" });
+    },
+
+    startProcessing: async (appId: string) => {
+      console.log("🔄 [GlobalContext] Starting processing for app:", appId);
+      dispatch({
+        type: "SET_PROCESSING",
+        payload: { isProcessing: true, appId },
+      });
+      dispatch({ type: "SET_ERROR", payload: null });
+    },
+
+    stopProcessing: () => {
+      console.log("🏁 [GlobalContext] Stopping processing");
+      dispatch({
+        type: "SET_PROCESSING",
+        payload: { isProcessing: false, appId: null },
+      });
+    },
+
+    setError: (error: string) => {
+      dispatch({ type: "SET_ERROR", payload: error });
     },
 
     retryFailedRequest: async () => {

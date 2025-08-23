@@ -9,7 +9,7 @@ import TopicsMainDataTable from "./components/custom/TopicsMainDataTable";
 import SentimentAvgPane from "./components/custom/SentimentAvgPane";
 import RatingAvgPane from "./components/custom/RatingAvgPane";
 import LatestReviewPane from "./components/custom/LatestReviewPane";
-import SentimentDotSpreadPane from "./components/custom/SentimentDotSpreadPane";
+import RatingTrendChart from "./components/custom/RatingTrendChart";
 import { GlobalProvider, useGlobalContext } from "./context/GlobalContext";
 import ErrorNotification from "./components/custom/ErrorNotification";
 import { AppWindow, Loader2 } from "lucide-react";
@@ -78,9 +78,11 @@ function AppContent() {
 
             <TabsContent value="Overview" className="col-span-2 w-9/10">
               <div className="grid grid-cols-3 gap-8">
-                {/* Left side - sentiment dot spread */}
+                {/* Left side - rating trend chart */}
                 <div className="col-span-2">
-                  <SentimentDotSpreadPane />
+                  <div className="h-[400px]">
+                    <RatingTrendChart />
+                  </div>
                 </div>
 
                 {/* Right side - 3 panes */}
@@ -96,7 +98,7 @@ function AppContent() {
                 </div>
               </div>
 
-              {/* Bottom section - original charts and tables */}
+              {/* Bottom section - charts and tables */}
               <div className="grid grid-cols-2 gap-8 mt-8">
                 <div>
                   <Card className="h-96">
@@ -108,6 +110,7 @@ function AppContent() {
                     </CardContent>
                   </Card>
                 </div>
+
                 <div>
                   <Card className="h-96">
                     <CardHeader>

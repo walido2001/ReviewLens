@@ -22,6 +22,7 @@ export const ENDPOINTS = {
   sentimentAvg: "/customer/sentiment/avg",
   ratingAvg: "/customer/rating/avg",
   ratingBreakdown: "/customer/reviews/rating-breakdown",
+  ratingTrend: "/customer/reviews/rating-trend",
 
   // Processing endpoints
   processApp: "/processing/process",

@@ -123,6 +123,15 @@ export const apiService = {
     return response.data;
   },
 
+  async fetchRatingTrend(appId: string, period: string = "daily") {
+    const response = await retryRequest(() =>
+      apiClient.get(ENDPOINTS.ratingTrend, {
+        params: { appID: appId, period },
+      })
+    );
+    return response.data;
+  },
+
   // Processing
   async processApp(appId: string) {
     const response = await retryRequest(() =>

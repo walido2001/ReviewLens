@@ -208,3 +208,33 @@ def get_all_apps():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@customer_blueprint.route("/reviews/rating-breakdown", methods=["GET"])
+def get_rating_breakdown():
+    try:
+        app_id = request.args.get("appID")
+
+        if not app_id:
+            return jsonify({"error": "AppID is required"}), 400
+
+        # Query to get count of reviews for each rating
+        rating_counts = db.session.query(
+            Review.rating,
+            func.count(Review.id).label('count')
+        ).filter_by(app_id=app_id)\
+         .group_by(Review.rating)\
+         .order_by(Review.rating)\
+         .all()
+
+        # Format the response as requested
+        breakdown = [
+            {"rating": str(rating), "count": str(count)} 
+            for rating, count in rating_counts
+        ]
+
+        return jsonify({
+            "app_id": app_id,
+            "rating_breakdown": breakdown
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

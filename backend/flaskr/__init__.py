@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from .logger import get_logger
 
 db = SQLAlchemy()
@@ -12,8 +13,13 @@ def create_app(config_class=None):
         from .config import DevelopmentConfig
         config_class = DevelopmentConfig
     app.config.from_object(config_class)
+
+    # Enable CORS for all routes
+    CORS(app, origins=["*"], supports_credentials=True, allow_headers=["Content-Type", "Authorization", "X-Requested-With"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
     
     db.init_app(app)
+    
+    logger.info("CORS enabled for all routes")
     
     from .routes.processing import processing_blueprint
     from .routes.customer import customer_blueprint
